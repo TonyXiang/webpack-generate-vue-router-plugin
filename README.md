@@ -10,7 +10,6 @@ npm i webpack-generate-vue-router-plugin -D
 ```
 
 ## Example
-```
 If there are these files:
 ```
 - src

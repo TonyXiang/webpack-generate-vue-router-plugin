@@ -1,6 +1,6 @@
 {
   "name": "webpack-generate-vue-router-plugin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Webpack plugin to generate vue router into a file",
   "main": "index.js",
   "scripts": {
