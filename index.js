@@ -1,10 +1,6 @@
-const generate = require('@babel/generator').default;
 const glob = require('glob');
 const fs = require('fs');
 const path = require('path');
-const babelParser = require('@babel/parser');
-const traverse = require('@babel/traverse');
-const t = require('@babel/types');
 const chokidar = require('chokidar');
 
 const PLUGIN_NAME = 'WebpackGenerateVueRouterPlugin';
@@ -48,8 +44,6 @@ class WebpackGenerateVueRouterPlugin {
         await this.generateRouter();
         this.watcher = this.createWatcher();
         this.isWatcherCreated = true;
-      } else {
-        await this.generateRouter();
       }
       callback();
     });
@@ -72,30 +66,27 @@ class WebpackGenerateVueRouterPlugin {
 
   generateRouter() {
     return new Promise((resolve, reject) => {
-      const self = this;
       this.chunkNames = [];
       this.errors = [];
       const { pattern, routerFilePath } = this.options;
       glob(pattern, {}, (error, files) => {
-        if (error) return reject(reject);
-        const ast = babelParser.parse(`/* eslint-disable */\nexport default {}`, {
-          sourceType: 'module',
-        });
-        traverse.default(ast, {
-          ObjectExpression(path) {
-            const properties = path.node.properties;
-            properties.push(...files.map((file) => self.getASTNode(file)));
-          },
-        });
+        if (error) return reject(error);
 
-        const output = generate(ast, {});
+        const output = this.generateFileContent(files);
         const oldCode = fs.existsSync(routerFilePath) ? fs.readFileSync(routerFilePath, { encoding: 'utf8' }) : null;
-        if (oldCode !== output.code) {
-          fs.writeFileSync(routerFilePath, output.code);
+        if (oldCode !== output) {
+          fs.writeFileSync(routerFilePath, output);
         }
         resolve();
       });
     });
+  }
+
+  generateFileContent(files) {
+    const routerNodeList = files.map((file) => {
+      return this.getRouterNode(file);
+    });
+    return `/* eslint-disable */\nexport default {\n${routerNodeList.join('')}}`;
   }
 
   getAliasPath(file) {
@@ -109,33 +100,14 @@ class WebpackGenerateVueRouterPlugin {
     return file;
   }
 
-  getASTNode(file) {
+  getRouterNode(file) {
     const aliasPath = this.getAliasPath(file);
     const chunkName = this.getChunkName(file);
     if (this.chunkNames.find((item) => item === chunkName)) {
       this.errors.push(new Error(`${PLUGIN_NAME}: Duplicate route key "${chunkName}"`));
     }
     this.chunkNames.push(chunkName);
-    const stringLiteral = t.stringLiteral(aliasPath);
-    t.addComments(stringLiteral, 'leading', [
-      {
-        type: 'CommentBlock',
-        value: ` webpackChunkName: "${chunkName}" `,
-      },
-    ]);
-    // eslint-disable-next-line prettier/prettier
-    return t.objectProperty(
-      t.stringLiteral(chunkName),
-      t.arrowFunctionExpression(
-        [],
-        t.callExpression(
-          t.import(),
-          [
-            stringLiteral
-          ]
-        ),
-      )
-    )
+    return `  "${chunkName}": () => import(/* webpackChunkName: "${chunkName}" */ "${aliasPath}"),\n`;
   }
 
   getChunkName(file) {
@@ -143,6 +115,9 @@ class WebpackGenerateVueRouterPlugin {
     const result = this.routerKeyMatch.exec(content);
     if (result && result[2]) {
       return result[2];
+    }
+    if (this.options.useBasename) {
+      return path.basename(file, path.extname(file));
     }
     const dirname = path.dirname(file);
     const newPath = dirname.split('/').pop();

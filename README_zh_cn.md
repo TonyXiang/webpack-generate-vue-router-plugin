@@ -2,7 +2,7 @@
 
 [en](https://github.com/TonyXiang/webpack-generate-vue-router-plugin/blob/main/README.md)｜[中文](https://github.com/TonyXiang/webpack-generate-vue-router-plugin/blob/main/README_zh_cn.md)
 
-> A Webpack plugin to generate vue router;It will update the router file by watching router files add/change/delete.
+> 根据目录自动生成路由文件;在开发环境使用时，会根据文件变化而自动更新路由文件;
 
 ## Requirements
 - webpack >= v4.0.0
@@ -13,7 +13,7 @@ npm i webpack-generate-vue-router-plugin -D
 ```
 
 ## Example
-If there are these files:
+如果有以下文件:
 ```
 - src
  - views
@@ -25,7 +25,7 @@ If there are these files:
    - index.vue
 ```
 
-Settings in `webpack.config.js`
+在 `webpack.config.js` 中设置：
 ```js
 import WebpackGenerateVueRouterPlugin from 'webpack-generate-vue-router-plugin'
 
@@ -40,7 +40,7 @@ module.exports = {
 }
 ```
 
-A .js file would be generated in path `routerFilePath` like this:
+会在`routerFilePath`这个路径下生成一个路由文件：
 ```js
 /* eslint-disable */
 export default {
@@ -50,7 +50,7 @@ export default {
 }
 ```
 
-As you see, there is a `@` in `"@/views/dashboard/index.vue"`. Because I set alias in `webpack.config.js`:
+我们可以看到在生成的文件中有带有 `@`，那是因为在 `webpack.config.js` 设置了 `alias`:
 ```js
 const path = require('path')
 
@@ -66,27 +66,29 @@ module.exports = {
 }
 ```
 
-**The plugin will work correctly if you set any other alias or set no alias**.
+**如果设置了其他的`alias`或者不设置`alias`, 插件也能正确的处理**.
 
 ## Options
 
 | params | type | default | isRequired | intro |
 | - | - | - | - | - |
-| pattern | `glob` | `undefined` | `true` | glob pattern that tells the plugin witch file should be treated as a router file. |
-| routerFilePath | `String` | `undefined` | `true` | the path of output router file. |
-| watchPath | `String` | `undefined` | `true` | tell the plugin witch dir should be watched. |
-| useBasename | `Boolean` | `false` | `false` | if there is a router file `src/views/.../org-management/org-list.vue` that match the glob, `org-management` would be the chunkName by default; `org-list` would be the chunkName if `useBasename` is set to `true`. |
+| pattern | `glob` | `undefined` | `true` | 匹配到的文件将被当成路由写入到最终的路由文件中 |
+| routerFilePath | `String` | `undefined` | `true` | 生成的路由文件的路径 |
+| watchPath | `String` | `undefined` | `true` | 告诉插件监听哪个目录文件的变化；当监听到文件变化时，会自动更新路由文件 |
+| useBasename | `Boolean` | `false` | `false` | 如果有一个文件通过glob匹配到的文件 `src/views/.../org-management/org-list.vue`,在默认情况下会取`org-management`作为chunkName; 如果把`useBasename`设置为`true`,就会取`org-list` 作为 chunkName |
 
-If you don't want to use `org-management` or `org-list` as chunkName，you can add comments in `src/views/.../org-management/org-list.vue`
+如果不想使用`org-management`或者`org-list`作为chunkName，你也可以在`src/views/.../org-management/org-list.vue` 文件中加入注释
 
 ```js
 /** VueRouterKey foo-bar */
 ```
 
-In this way, `foo-bar` would be the chunkName:
+那么，`foo-bar` 将会被当成 chunkName:
 
 ```js
 ...
   "foo-bar": () => import(/* webpackChunkName: "foo-bar" */ "@/views/.../org-management/org-list.vue"),
 ...
 ```
+
+

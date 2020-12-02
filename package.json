@@ -1,6 +1,6 @@
 {
   "name": "webpack-generate-vue-router-plugin",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A Webpack plugin to generate vue router into a file",
   "main": "index.js",
   "scripts": {
@@ -18,10 +18,6 @@
   "repository": "TonyXiang/webpack-generate-vue-router-plugin",
   "dependencies": {},
   "devDependencies": {
-    "@babel/generator": "^7.12.5",
-    "@babel/parser": "^7.12.5",
-    "@babel/traverse": "^7.12.5",
-    "@babel/types": "^7.12.6",
     "chokidar": "^3.4.3",
     "glob": "^7.1.6"
   }
