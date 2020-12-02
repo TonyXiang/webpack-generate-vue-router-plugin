@@ -75,7 +75,7 @@ module.exports = {
 | pattern | `glob` | `undefined` | `true` | 匹配到的文件将被当成路由写入到最终的路由文件中 |
 | routerFilePath | `String` | `undefined` | `true` | 生成的路由文件的路径 |
 | watchPath | `String` | `undefined` | `true` | 告诉插件监听哪个目录文件的变化；当监听到文件变化时，会自动更新路由文件 |
-| useBasename | `Boolean` | `false` | `false` | 如果有一个文件通过glob匹配到的文件 `src/views/.../org-management/org-list.vue`,在默认情况下会取`org-management`作为chunkName; 如果把`useBasename`设置为`true`,就会取`org-list` 作为 chunkName |
+| useBasename | `Boolean` | `false` | `false` | 如果有一个通过glob匹配到的文件 `src/views/.../org-management/org-list.vue`,在默认情况下会取`org-management`作为chunkName; 如果把`useBasename`设置为`true`,就会取`org-list` 作为 chunkName |
 
 如果不想使用`org-management`或者`org-list`作为chunkName，你也可以在`src/views/.../org-management/org-list.vue` 文件中加入注释
 
