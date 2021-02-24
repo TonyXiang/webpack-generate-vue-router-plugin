@@ -101,7 +101,7 @@ class WebpackGenerateVueRouterPlugin {
   }
 
   getRouterNode(file) {
-    const aliasPath = this.getAliasPath(file);
+    let aliasPath = this.getAliasPath(file);
     aliasPath = aliasPath.split(path.sep).join('/'); // Windows-style to Linux-style
     const chunkName = this.getChunkName(file);
     if (this.chunkNames.find((item) => item === chunkName)) {
